@@ -6,7 +6,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const PLAYFAB_API_URL = "https://titleId.playfabapi.com";
-const TITLE_ID = "YOUR_PLAYFAB_TITLE_ID";
+const TITLE_ID = "2F5F0";
 
 app.post('/login', async (req, res) => {
   const { username, password, titleId } = req.body;
