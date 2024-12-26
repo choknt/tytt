@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlayFab Email Verification</title>
+</head>
+<body>
+  <h1>PlayFab Email Verification</h1>
+  <form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" required>
+    <button type="submit">Log In</button>
+  </form>
+
+  <form id="emailForm" style="display:none;">
+    <label for="email">Contact Email:</label>
+    <input type="email" id="email" required>
+    <button type="submit">Add/Update Email</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    const playFabTitleId = "YOUR_PLAYFAB_TITLE_ID"; // ใส่ Title ID ของคุณ
+
+    // Login to PlayFab
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const loginResponse = await fetch('https://YOUR_SERVER_DOMAIN/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, titleId: playFabTitleId })
+      });
+
+      const loginResult = await loginResponse.json();
+      if (loginResult.success) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('emailForm').style.display = 'block';
+        localStorage.setItem('playFabSessionTicket', loginResult.sessionTicket);
+      } else {
+        document.getElementById('status').textContent = 'Login Failed: ' + loginResult.errorMessage;
+      }
+    });
+
+    // Add/Update Contact Email
+    document.getElementById('emailForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const sessionTicket = localStorage.getItem('playFabSessionTicket');
+
+      const emailResponse = await fetch('https://YOUR_SERVER_DOMAIN/addOrUpdateEmail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, sessionTicket })
+      });
+
+      const emailResult = await emailResponse.json();
+      document.getElementById('status').textContent = emailResult.success
+        ? 'Email Updated Successfully!'
+        : 'Failed to Update Email: ' + emailResult.errorMessage;
+    });
+  </script>
+</body>
+</html>
